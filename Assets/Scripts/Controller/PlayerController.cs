@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] float moveSpeed;
     [SerializeField] float bouncePower;
+    [SerializeField] FixedJoystick fixedJoystick;
 
     public Vector2 inputVec;
 
@@ -19,12 +20,16 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (fixedJoystick != null)
+            inputVec = new Vector2(fixedJoystick.Horizontal, fixedJoystick.Vertical);
+
         Move();
     }
 
     void OnMove(InputValue value)
     {
-        inputVec = value.Get<Vector2>();
+        if (fixedJoystick == null)
+            inputVec = value.Get<Vector2>();
     }
 
     void Move()
@@ -56,6 +61,7 @@ public class PlayerController : MonoBehaviour
                 if (contact.normal.y > 0.7f)
                 {
                     rigid.linearVelocity = new Vector2(rigid.linearVelocity.x, bouncePower);
+                    SoundManager.instance.PlaySFX("Bounce");
                     break;
                 }
             }

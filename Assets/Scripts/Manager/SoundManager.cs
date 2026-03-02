@@ -1,32 +1,34 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[System.Serializable]
-public class Sound
-{
-    public string name;
-    public AudioClip clip;
-}
 
-public enum BgmClips
-{
-    StartScene, PlayScene,
-}
+
 
 public class SoundManager : MonoBehaviour
 {
-    string currentScene;
-    BgmClips currentBgm;
 
-    [SerializeField] Sound[] bgmClips;
+    public static SoundManager instance;
+
+    Dictionary<string, SoundData> soundDict = new Dictionary<string, SoundData>();
+
     [SerializeField] AudioSource bgmSource;
-
-    [SerializeField] Sound[] sfxClips;
     [SerializeField] AudioSource[] sfxSources;
+    [SerializeField] SoundData[] soundData;
+    int channelIndex;
 
 
     void Awake()
     {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+            Destroy(gameObject);
+
+
         bgmSource = GetComponentInChildren<AudioSource>();
         Transform sfxPlayer = transform.GetChild(1);
         sfxSources = sfxPlayer.GetComponents<AudioSource>();
@@ -36,30 +38,63 @@ public class SoundManager : MonoBehaviour
             sfxSources[i].playOnAwake = false;
             sfxSources[i].loop = false;
         }
-    }
 
-    void Update()
-    {
-        currentScene = SceneManager.GetActiveScene().name;
-
-        if (System.Enum.TryParse(currentScene, out BgmClips bgmType))
+        foreach (SoundData data in soundData)
         {
-            if (currentBgm != bgmType)
-            {
-                PlayBGM(bgmType);
-                currentBgm = bgmType;
-            }
+            soundDict[data.soundName] = data;
+
+            // 씬 이름으로도 등록 여러 씬들에서 같은 배경음악을 실행시킬때 필요
+            foreach (string sceneName in data.sceneNames)
+                soundDict[sceneName] = data;
         }
     }
 
-    void PlayBGM(BgmClips _clip)
+    void OnEnable()
     {
-        int index = (int)_clip;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
 
-        if (index < bgmClips.Length)
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        SceneLoadedBGM(scene);
+    }
+
+    void SceneLoadedBGM(Scene scene)
+    {
+        PlayBGM(scene.name);
+    }
+
+    void PlayBGM(string clipName)
+    {
+        if (!soundDict.TryGetValue(clipName, out SoundData data)) return;
+        if (bgmSource.clip == data.clip) return;
+
+        bgmSource.clip = data.clip;
+        bgmSource.volume = data.volume;
+        bgmSource.pitch = data.pitch;
+        bgmSource.Play();
+    }
+
+    public void PlaySFX(string clipName)
+    {
+        if (!soundDict.TryGetValue(clipName, out SoundData data)) return;
+        for (int i = 0; i < sfxSources.Length; i++)
         {
-            bgmSource.clip = bgmClips[index].clip;
-            bgmSource.Play();
+            int loopIndex = (i + channelIndex) % sfxSources.Length;
+            if (sfxSources[loopIndex].isPlaying)
+                continue;
+
+            sfxSources[loopIndex].clip = data.clip;
+            sfxSources[loopIndex].volume = data.volume;
+            sfxSources[loopIndex].pitch = data.pitch;
+            sfxSources[loopIndex].Play();
+            channelIndex = (loopIndex + 1) % sfxSources.Length;
+            return;
         }
     }
 

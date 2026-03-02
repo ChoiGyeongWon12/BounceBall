@@ -1344,7 +1344,6 @@ MonoBehaviour:
   m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
-  m_Version: 2
   m_TaaSettings:
     m_Quality: 3
     m_FrameInfluence: 0.1
@@ -1352,6 +1351,7 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -1598,6 +1598,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -1685,9 +1686,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f924284825f3c2c43a6c72667c83a77e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bgmClips: []
   bgmSource: {fileID: 0}
-  sfxClips: []
   sfxSources:
   - {fileID: 0}
   - {fileID: 0}
@@ -1699,6 +1698,10 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  soundData:
+  - {fileID: 11400000, guid: 88a9f8b5c9ba6124da48c285091d6c53, type: 2}
+  - {fileID: 11400000, guid: 7536e74853420304f8c9853a0a3ac185, type: 2}
+  - {fileID: 11400000, guid: e8f2d074919ad41418aa52057d37ef27, type: 2}
 --- !u!1 &981196722
 GameObject:
   m_ObjectHideFlags: 0
